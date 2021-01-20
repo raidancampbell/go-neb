@@ -20,7 +20,7 @@ type Service struct {
 // Commands supported:
 //    !echo some message
 // Responds with a notice of "some message".
-func (e *Service) Commands(cli types.MatrixClient) []types.Command {
+func (e *Service) Commands(_ types.MatrixClient) []types.Command {
 	return []types.Command{
 		{
 			Path: []string{"echo"},

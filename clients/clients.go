@@ -181,6 +181,7 @@ func (c *Clients) onMessageEvent(botClient *BotClient, event *mevt.Event) {
 	var responses []interface{}
 
 	for _, service := range services {
+		//TODO: nuke this
 		if body[0] == '!' { // message is a command
 			args, err := shellwords.Parse(body[1:])
 			if err != nil {
