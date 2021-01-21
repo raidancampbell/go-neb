@@ -3,6 +3,7 @@ package clients
 import (
 	"database/sql"
 	"fmt"
+	"github.com/matrix-org/go-neb/services/htmltitle"
 	"github.com/matrix-org/go-neb/services/ping"
 	"github.com/matrix-org/go-neb/services/utils/triggers"
 	"net/http"
@@ -429,7 +430,7 @@ func (c *Clients) initClient(botClient *BotClient) error {
 // yeah, yeah, bad form.  keeps the diff small and it'll prevent future conflicts
 var t []triggers.Trigger
 func init() {
-	t = []triggers.Trigger{ping.UserPingPong}
+	t = []triggers.Trigger{ping.UserPingPong, htmltitle.HTMLTitle}
 }
 
 func handleTriggers(event *mevt.Event) *mevt.MessageEventContent {
