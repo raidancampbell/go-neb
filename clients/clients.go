@@ -3,6 +3,8 @@ package clients
 import (
 	"database/sql"
 	"fmt"
+	"github.com/matrix-org/go-neb/services/ping"
+	"github.com/matrix-org/go-neb/services/utils/triggers"
 	"net/http"
 	"reflect"
 	"strings"
@@ -181,7 +183,9 @@ func (c *Clients) onMessageEvent(botClient *BotClient, event *mevt.Event) {
 	var responses []interface{}
 
 	for _, service := range services {
-		//TODO: nuke this
+		if response := handleTriggers(event); response != nil {
+			responses = append(responses, response)
+		}
 		if body[0] == '!' { // message is a command
 			args, err := shellwords.Parse(body[1:])
 			if err != nil {
@@ -418,5 +422,27 @@ func (c *Clients) initClient(botClient *BotClient) error {
 		go botClient.Sync()
 	}
 
+	return nil
+}
+
+
+// yeah, yeah, bad form.  keeps the diff small and it'll prevent future conflicts
+var t []triggers.Trigger
+func init() {
+	t = []triggers.Trigger{ping.UserPingPong}
+}
+
+func handleTriggers(event *mevt.Event) *mevt.MessageEventContent {
+	for _, trigger := range t {
+		if !trigger.GetMeta().Disabled && trigger.Condition(event) {
+			shouldContinue, msg := trigger.Action(event)
+			if msg != nil {
+				return msg
+			}
+			if !shouldContinue {
+				break
+			}
+		}
+	}
 	return nil
 }
